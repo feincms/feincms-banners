@@ -15,8 +15,11 @@
 </div>
 <script>
 (function() { try {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', '{{ banner.impression_url }}');
+  var xhr = new XMLHttpRequest(),
+    url = '{{ banner.impression_url }}?_bimp=' + Math.random();
+  if (url) {
+    xhr.open('GET', url);
     xhr.send(null);
+  }
 } catch(e) {}; })();
 </script>
