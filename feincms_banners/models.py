@@ -56,7 +56,7 @@ class Banner(models.Model):
     embeds = models.PositiveIntegerField(_('embeds'), default=0,
         editable=False,
         help_text=_('How many times has this banner been embdedded on a'
-            ' website?')
+            ' website?'))
     impressions = models.PositiveIntegerField(_('impressions'), default=0,
         editable=False,
         help_text=_('How many times has an impression been registered using'
@@ -67,7 +67,7 @@ class Banner(models.Model):
     objects = BannerManager()
 
     class Meta:
-        ordering= ['-active_from']
+        ordering = ['-active_from']
         verbose_name = _('banner')
         verbose_name_plural = _('banners')
 
@@ -103,6 +103,6 @@ class Click(models.Model):
     referrer = models.TextField(_('referrer'), blank=True, default='')
 
     class Meta:
-        orering = ['-timestamp']
+        ordering = ['-timestamp']
         verbose_name = _('click')
         verbose_name_plural = _('clicks')
