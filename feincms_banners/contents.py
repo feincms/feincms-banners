@@ -27,7 +27,7 @@ class BannerContent(models.Model):
     class Meta:
         abstract = True
         verbose_name = _('banner')
-        verbose_name = _('banners')
+        verbose_name_plural = _('banners')
 
     def render(self, **kwargs):
         if self.specific:
