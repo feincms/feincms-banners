@@ -1,0 +1,22 @@
+<div style="margin-top:35px;">
+<div style="font-size:10px;position:relative;top:8px;left:1px;">Anzeige</div>
+<div class="box" style="background:none;overflow:hidden;padding:8px 0 0 0;margin:0;">
+{% if banner.mediafile.type == 'swf' %}
+    <object type='application/x-shockwave-flash' data='{{ banner.mediafile.file.url }}' width='160' height='600'>
+        <param name='allowScriptAccess' value='always' />
+        <param name='movie' value='{{ banner.mediafile.file.url }}' />
+    </object>
+{% else %}
+    <a href="{{ banner.get_absolute_url }}" target="_blank">
+        <img src="{{ banner.mediafile.file.url }}" alt="">
+    </a>
+{% endif %}
+</div>
+</div>
+<script>
+(function() { try {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '{{ banner.impression_url }}');
+    xhr.send(null);
+} catch(e) {}; })();
+</script>
