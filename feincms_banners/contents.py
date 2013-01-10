@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import F
 from django.template.loader import render_to_string
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from feincms_banners.models import Banner
@@ -31,7 +32,12 @@ class BannerContent(models.Model):
 
     def render(self, **kwargs):
         if self.specific:
-            if self.specific.is_active:
+            if (self.specific.is_active
+                    and self.specific.active_from <= timezone.now()
+                    and (
+                        not self.specific.active_until
+                        or self.specific.active_until >= timezone.now()
+                    )):
                 banner = self.specific
                 type = banner.type
             else:
