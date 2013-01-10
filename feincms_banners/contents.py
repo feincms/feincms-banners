@@ -55,4 +55,5 @@ class BannerContent(models.Model):
         return render_to_string([
             'content/banner/%s.html' % type,
             'content/banner/default.html',
-            ], {'content': self, 'banner': banner})
+            ], {'content': self, 'banner': banner},
+            context_instance=kwargs.get('context'))
