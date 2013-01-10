@@ -6,7 +6,7 @@ from feincms_banners.models import Banner
 
 
 def click(request, code):
-    banner = get_object_or_404(Banner, code=code)
+    banner = get_object_or_404(Banner.objects.active(), code=code)
     banner.click(request)
     return HttpResponseRedirect(banner.url)
 
