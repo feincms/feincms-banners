@@ -7,7 +7,7 @@
         <param name='movie' value='{{ banner.mediafile.file.url }}' />
     </object>
 {% else %}
-    <a href="{{ banner.get_absolute_url }}" target="_blank">
+    <a href="{{ banner.get_absolute_url }}" target="_blank" rel="nofollow">
         <img src="{{ banner.mediafile.file.url }}" alt="">
     </a>
 {% endif %}
