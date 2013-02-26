@@ -44,7 +44,7 @@ class Banner(models.Model):
         help_text=_('Only for internal use, will not be shown on the website.'
         ))
     mediafile = MediaFileForeignKey(MediaFile, verbose_name=_('media file'))
-    url = models.URLField(_('URL'), verify_exists=False)
+    url = models.URLField(_('URL'))
     type = models.CharField(_('type'), max_length=20, choices=TYPE_CHOICES)
     code = models.CharField(_('code'), max_length=40, default=generate_key,
         unique=True)
