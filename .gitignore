@@ -1,2 +1,4 @@
+.*.sw?
 *.pyc
 *.egg-info
+dist
