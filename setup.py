@@ -35,6 +35,7 @@ setup(
     },
     install_requires=[
         'Django>=1.4.2',
+        'FeinCMS>=1.6',
     ],
     classifiers=[
         # 'Development Status :: 5 - Production/Stable',
