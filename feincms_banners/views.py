@@ -12,7 +12,7 @@ def click(request, code):
 
 
 def impression(request, code):
-    if (not request.is_ajax() and Banner.objects.filter(code=code).update(
+    if (request.is_ajax() and Banner.objects.filter(code=code).update(
             impressions=F('impressions') + 1
             )):
         return HttpResponse('+1')

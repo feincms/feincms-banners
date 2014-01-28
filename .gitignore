@@ -2,3 +2,7 @@
 *.pyc
 *.egg-info
 dist
+.tox
+.coverage
+venv
+/tests/media
