@@ -1,3 +1,5 @@
+from __future__ import absolute_import, unicode_literals
+
 from django.db import models
 from django.db.models import F
 from django.template.loader import render_to_string
@@ -45,7 +47,7 @@ class BannerContent(models.Model):
                 banner = self.specific
                 type = banner.type
             else:
-                return u''
+                return ''
         else:
             try:
                 banner = Banner.objects.active().filter(
@@ -53,7 +55,7 @@ class BannerContent(models.Model):
                 ).select_related('mediafile').order_by('?')[0]
                 type = self.type
             except IndexError:
-                return u''
+                return ''
 
         Banner.objects.filter(id=banner.id).update(embeds=F('embeds') + 1)
 

@@ -1,3 +1,5 @@
+from __future__ import absolute_import, unicode_literals
+
 from django.db.models import F
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
