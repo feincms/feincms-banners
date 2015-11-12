@@ -88,8 +88,14 @@ class Banner(models.Model):
         return ('banner_impression', (), {'code': self.code})
 
     def click(self, request):
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+
         self.clicks.create(
-            ip=request.META.get('REMOTE_ADDR'),
+            ip=ip or None,
             user_agent=request.META.get('HTTP_USER_AGENT', ''),
             referrer=request.META.get('HTTP_REFERER', ''),
         )
