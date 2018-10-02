@@ -6,6 +6,6 @@ from feincms_banners import views
 
 
 urlpatterns = [
-    url(r'^b/c/(?P<code>[^/]+)/$', views.click, name='banner_click'),
-    url(r'^b/i/(?P<code>[^/]+)/$', views.impression, name='banner_impression'),
+    url(r"^b/c/(?P<code>[^/]+)/$", views.click, name="banner_click"),
+    url(r"^b/i/(?P<code>[^/]+)/$", views.impression, name="banner_impression"),
 ]

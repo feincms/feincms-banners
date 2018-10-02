@@ -5,15 +5,22 @@ from random import choice
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
+
+try:
+    from django.urls import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
 
 from feincms.module.medialibrary.fields import MediaFileForeignKey
 from feincms.module.medialibrary.models import MediaFile
 
 
 def generate_key():
-    return ''.join([
-        choice('abcdefghijklmnopqrstuvwxyz0123456789-_') for i in range(40)])
+    return "".join(
+        [choice("abcdefghijklmnopqrstuvwxyz0123456789-_") for i in range(40)]
+    )
 
 
 class BannerManager(models.Manager):
@@ -22,98 +29,105 @@ class BannerManager(models.Manager):
             Q(is_active=True, active_from__lte=timezone.now())
             & (
                 Q(active_until__isnull=True)
-                | Q(
-                    active_until__isnull=False,
-                    active_until__gte=timezone.now()
-                )
+                | Q(active_until__isnull=False, active_until__gte=timezone.now())
             )
         )
 
 
+@python_2_unicode_compatible
 class Banner(models.Model):
-    SKYSCRAPER = 'skyscraper'
-    LEADERBOARD = 'leaderboard'
-    BOX = 'box'
+    SKYSCRAPER = "skyscraper"
+    LEADERBOARD = "leaderboard"
+    BOX = "box"
 
     TYPE_CHOICES = (
-        (SKYSCRAPER, _('skyscraper')),
-        (LEADERBOARD, _('leaderboard')),
-        (BOX, _('box')),
+        (SKYSCRAPER, _("skyscraper")),
+        (LEADERBOARD, _("leaderboard")),
+        (BOX, _("box")),
     )
 
-    is_active = models.BooleanField(_('is active'), default=True)
+    is_active = models.BooleanField(_("is active"), default=True)
     name = models.CharField(
-        _('name'), max_length=100, help_text=_(
-            'Only for internal use, will not be shown on the website.'))
-    mediafile = MediaFileForeignKey(MediaFile, verbose_name=_('media file'))
-    url = models.URLField(_('URL'))
-    type = models.CharField(_('type'), max_length=20, choices=TYPE_CHOICES)
-    code = models.CharField(
-        _('code'), max_length=40, default=generate_key, unique=True)
+        _("name"),
+        max_length=100,
+        help_text=_("Only for internal use, will not be shown on the website."),
+    )
+    mediafile = MediaFileForeignKey(
+        MediaFile, on_delete=models.CASCADE, verbose_name=_("media file")
+    )
+    url = models.URLField(_("URL"))
+    type = models.CharField(_("type"), max_length=20, choices=TYPE_CHOICES)
+    code = models.CharField(_("code"), max_length=40, default=generate_key, unique=True)
 
-    active_from = models.DateTimeField(
-        _('active from'), default=timezone.now)
-    active_until = models.DateTimeField(
-        _('active until'), blank=True, null=True)
+    active_from = models.DateTimeField(_("active from"), default=timezone.now)
+    active_until = models.DateTimeField(_("active until"), blank=True, null=True)
 
     embeds = models.PositiveIntegerField(
-        _('embeds'), default=0, editable=False,
-        help_text=_(
-            'How many times has this banner been embdedded on a website?'))
+        _("embeds"),
+        default=0,
+        editable=False,
+        help_text=_("How many times has this banner been embdedded on a website?"),
+    )
     impressions = models.PositiveIntegerField(
-        _('impressions'), default=0,
+        _("impressions"),
+        default=0,
         editable=False,
         help_text=_(
-            'How many times has an impression been registered using'
-            ' a Javascript callback, verifying that it actually was a'
-            ' browser? (Too low because of network issues and deactivated'
-            ' Javascript support in some browsers.)'))
+            "How many times has an impression been registered using"
+            " a Javascript callback, verifying that it actually was a"
+            " browser? (Too low because of network issues and deactivated"
+            " Javascript support in some browsers.)"
+        ),
+    )
 
     objects = BannerManager()
 
     class Meta:
-        ordering = ['-active_from']
-        verbose_name = _('banner')
-        verbose_name_plural = _('banners')
+        ordering = ["-active_from"]
+        verbose_name = _("banner")
+        verbose_name_plural = _("banners")
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
-    @models.permalink
     def get_absolute_url(self):
-        return ('banner_click', (), {'code': self.code})
+        return reverse("banner_click", kwargs={"code": self.code})
 
-    @models.permalink
     def impression_url(self):
-        return ('banner_impression', (), {'code': self.code})
+        return reverse("banner_impression", kwargs={"code": self.code})
 
     def click(self, request):
-        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
         if x_forwarded_for:
-            ip = x_forwarded_for.split(',')[0]
+            ip = x_forwarded_for.split(",")[0]
         else:
-            ip = request.META.get('REMOTE_ADDR')
+            ip = request.META.get("REMOTE_ADDR")
 
         self.clicks.create(
             ip=ip or None,
-            user_agent=request.META.get('HTTP_USER_AGENT', ''),
-            referrer=request.META.get('HTTP_REFERER', ''),
+            user_agent=request.META.get("HTTP_USER_AGENT", ""),
+            referrer=request.META.get("HTTP_REFERER", ""),
         )
 
     def click_count(self):
         return self.clicks.count()
-    click_count.short_description = _('click count')
+
+    click_count.short_description = _("click count")
 
 
 class Click(models.Model):
     banner = models.ForeignKey(
-        Banner, verbose_name=_('banner'), related_name='clicks')
-    timestamp = models.DateTimeField(_('timestamp'), default=timezone.now)
-    ip = models.IPAddressField(_('IP'), blank=True, null=True)
-    user_agent = models.TextField(_('user agent'), blank=True, default='')
-    referrer = models.TextField(_('referrer'), blank=True, default='')
+        Banner,
+        on_delete=models.CASCADE,
+        verbose_name=_("banner"),
+        related_name="clicks",
+    )
+    timestamp = models.DateTimeField(_("timestamp"), default=timezone.now)
+    ip = models.GenericIPAddressField(_("IP"), blank=True, null=True)
+    user_agent = models.TextField(_("user agent"), blank=True, default="")
+    referrer = models.TextField(_("referrer"), blank=True, default="")
 
     class Meta:
-        ordering = ['-timestamp']
-        verbose_name = _('click')
-        verbose_name_plural = _('clicks')
+        ordering = ["-timestamp"]
+        verbose_name = _("click")
+        verbose_name_plural = _("clicks")

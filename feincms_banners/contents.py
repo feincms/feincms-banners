@@ -12,7 +12,7 @@ from feincms.admin.item_editor import FeinCMSInline
 
 
 class BannerContentInline(FeinCMSInline):
-    raw_id_fields = ('specific',)
+    raw_id_fields = ("specific",)
 
 
 class BannerContent(models.Model):
@@ -21,17 +21,20 @@ class BannerContent(models.Model):
     is_section_aware = True
 
     specific = models.ForeignKey(
-        Banner, verbose_name=_('specific'),
-        blank=True, null=True, limit_choices_to={'is_active': True},
-        help_text=_(
-            'If you leave this empty, a random banner will be selected.'))
-    type = models.CharField(
-        _('type'), max_length=20, choices=Banner.TYPE_CHOICES)
+        Banner,
+        on_delete=models.CASCADE,
+        verbose_name=_("specific"),
+        blank=True,
+        null=True,
+        limit_choices_to={"is_active": True},
+        help_text=_("If you leave this empty, a random banner will be selected."),
+    )
+    type = models.CharField(_("type"), max_length=20, choices=Banner.TYPE_CHOICES)
 
     class Meta:
         abstract = True
-        verbose_name = _('banner')
-        verbose_name_plural = _('banners')
+        verbose_name = _("banner")
+        verbose_name_plural = _("banners")
 
     def render(self, **kwargs):
         if self.specific:
@@ -41,28 +44,30 @@ class BannerContent(models.Model):
                 and (
                     not self.specific.active_until
                     or self.specific.active_until >= timezone.now()
-                ))
+                )
+            )
 
             if specific_is_active:
                 banner = self.specific
                 type = banner.type
             else:
-                return ''
+                return ""
         else:
             try:
-                banner = Banner.objects.active().filter(
-                    type=self.type,
-                ).select_related('mediafile').order_by('?')[0]
+                banner = (
+                    Banner.objects.active()
+                    .filter(type=self.type)
+                    .select_related("mediafile")
+                    .order_by("?")[0]
+                )
                 type = self.type
             except IndexError:
-                return ''
+                return ""
 
-        Banner.objects.filter(id=banner.id).update(embeds=F('embeds') + 1)
+        Banner.objects.filter(id=banner.id).update(embeds=F("embeds") + 1)
 
         return render_to_string(
-            [
-                'content/banner/%s.html' % type,
-                'content/banner/default.html',
-            ],
-            {'content': self, 'banner': banner},
-            context_instance=kwargs.get('context'))
+            ["content/banner/%s.html" % type, "content/banner/default.html"],
+            {"content": self, "banner": banner},
+            request=kwargs.get("request"),
+        )

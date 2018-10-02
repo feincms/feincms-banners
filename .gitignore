@@ -6,3 +6,5 @@ dist
 .coverage
 venv
 /tests/media
+*.sqlite
+htmlcov
